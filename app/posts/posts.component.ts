@@ -7,18 +7,20 @@ import {PostService} from './posts.Service';
 import {UsersService} from '../users/users.service';
 import {SpinnerComponent} from '../shared/spinner.component';
 import {ShowPostDirective} from './posts.directive';
+import {PaginationComponent} from '../shared/pagination.component'
 
 
 @Component ({
     templateUrl: 'app/posts/posts.template.html',
     providers: [PostService, UsersService],
-    directives: [SpinnerComponent, ShowPostDirective],
+    directives: [SpinnerComponent, ShowPostDirective, PaginationComponent],
     styleUrls: ['app/posts/posts-styles.css']
     
     
 })
 
 export class PostsComponent implements OnInit{
+    
     showPost = false;    
     details = {};
     comments = [];    
@@ -27,6 +29,9 @@ export class PostsComponent implements OnInit{
     commentsLoading: boolean;
     allUsers = [];
     userPosts =[];
+    
+    pagePosts = [];
+    pageSize = 10;
     
     constructor(private _postService: PostService, private _router: Router, private _usersService: UsersService) {
         
@@ -90,12 +95,16 @@ export class PostsComponent implements OnInit{
          return this._postService.getUserPost(userId)
                 .subscribe(userposts => { 
                                           this.posts = userposts;
+                                          this.pagePosts = _.first(this.posts, this.pageSize);
                                           
                                         }
                            )
      }
         
-        
+     onPostsPageChanged (page) {
+         var startIndex = (page - 1) * this.pageSize;
+         this.pagePosts = _.first(_.rest(this.posts, startIndex), this.pageSize);
+     }
         
     
 }
